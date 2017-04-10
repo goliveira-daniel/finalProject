@@ -17,6 +17,8 @@ const grabContent = url => {
 	//     .all(urls.map(grabContent))
 	//     .then(() => console.log(`Urls ${urls} were grabbed`))
 // ================================================================
+const today = new Date()
+console.log(today)
 const objBond = (name, interestRateType, interestRateValue, timeToMaturity, faceValue) => {
 	let obj = {
 	  name,
@@ -29,9 +31,19 @@ const objBond = (name, interestRateType, interestRateValue, timeToMaturity, face
 	  	if (this.interestRateType.toLowerCase() == 'fixed') {
 	  		return calcFixed(this.faceValue,this.interestRateValue,this.timeToMaturity)
 	  	}
+	  	else {
+            return calcFixed(this.faceValue, getRate(searchIndex(today.setDate(today.getDate() + Number(this.timeToMaturity)), objFutureContracts), this.interestRateValue), this.timeToMaturity)
+	  	}
 	  }
 	}
   return obj
+}
+
+function getRate(rate, perc) {
+	rate = rate.replace(',','.')
+	return Number(rate) * (Number(perc) / 100)
+	// return rate * (perc / 100)
+	// body...
 }
 
 // const objFutureContracts = (contractMaturity, contractValue) => {
@@ -116,22 +128,40 @@ function changeMaturityDate(str) {
 console.log(objFutureContracts)
 
 const btn = document.querySelector("button")
+const p1 = document.getElementById("bond1_result")
+const p2 = document.getElementById("bond2_result")
 
 btn.addEventListener('click', (e) => {
 	e.preventDefault()
-	let bond1 = objBond(document.getElementById("Bond").value,document.getElementById("interestRateType").value, document.getElementById("interestRateValue").value, 
-		document.getElementById("timeToMaturity").value,
-		document.getElementById("faceValue").value)
-	console.log(bond1.calcFutureValue())
-
+	let bond1 = objBond(document.getElementById("Bond1").value,document.getElementById("interestRateType1").value, document.getElementById("interestRateValue1").value, 
+		document.getElementById("timeToMaturity1").value,
+		document.getElementById("faceValue1").value)
+	let bond2 = objBond(document.getElementById("Bond2").value,document.getElementById("interestRateType2").value, document.getElementById("interestRateValue2").value, 
+		document.getElementById("timeToMaturity2").value,
+		document.getElementById("faceValue2").value)
+	p1.innerHTML = bond1.calcFutureValue()
+	p2.innerHTML = bond2.calcFutureValue()
 })
 
 function calcFixed(value, rate, period) {
 	let futureValue = 0
-	futureValue = value * (1+(rate/100))^period
+	futureValue = value * (1+(rate/100))^(period/360)
 	return futureValue
 }
 
-function calcVariable(value, rate, index, period) {
-	// body...
+function searchIndex(futureDate, futureContracts) {
+	let f = new Date()
+	for (let i = 0; i < futureContracts.length; i++) {
+		f = Date.parse(futureContracts[i].maturityDate)
+		if (futureDate <= f) {
+			return futureContracts[i].maturityValue
+		}
+	}
+}
+
+Date.prototype.addDays = function addDays(days) {
+    let result = new Date(this);
+    console.log(result.getDate())
+    result.setDate(result.getDate() + days)
+    return result;
 }
