@@ -139,8 +139,8 @@ btn.addEventListener('click', (e) => {
 	let bond2 = objBond(document.getElementById("Bond2").value,document.getElementById("interestRateType2").value, document.getElementById("interestRateValue2").value, 
 		document.getElementById("timeToMaturity2").value,
 		document.getElementById("faceValue2").value)
-	p1.innerHTML = bond1.calcFutureValue()
-	p2.innerHTML = bond2.calcFutureValue()
+	p1.innerHTML = userFriendlyMsg(today.setDate(today.getDate() + Number(bond1.timeToMaturity)),bond1.calcFutureValue())
+	p2.innerHTML = userFriendlyMsg(today.setDate(today.getDate() + Number(bond2.timeToMaturity)),bond1.calcFutureValue())
 })
 
 function calcFixed(value, rate, period) {
@@ -157,6 +157,10 @@ function searchIndex(futureDate, futureContracts) {
 			return futureContracts[i].maturityValue
 		}
 	}
+}
+
+function userFriendlyMsg(maturityDate, futureValue) {
+	return `The value of this bond on ${maturityDate} is $${futureValue}`
 }
 
 Date.prototype.addDays = function addDays(days) {
